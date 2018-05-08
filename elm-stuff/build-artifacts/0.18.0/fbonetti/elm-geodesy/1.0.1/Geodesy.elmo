@@ -1,0 +1,182 @@
+var _fbonetti$elm_geodesy$Geodesy$degreesMinutesSeconds = function (decimal) {
+	var degrees = _elm_lang$core$Basics$floor(decimal);
+	var minutes = (decimal - _elm_lang$core$Basics$toFloat(degrees)) * 60;
+	var minutes_ = _elm_lang$core$Basics$floor(minutes);
+	var seconds = (minutes - _elm_lang$core$Basics$toFloat(minutes_)) * 60;
+	return {ctor: '_Tuple3', _0: degrees, _1: minutes_, _2: seconds};
+};
+var _fbonetti$elm_geodesy$Geodesy$decimalDegrees = function (_p0) {
+	var _p1 = _p0;
+	return (_elm_lang$core$Basics$toFloat(_p1._0) + (_elm_lang$core$Basics$toFloat(_p1._1) / 60)) + (_p1._2 / 3600);
+};
+var _fbonetti$elm_geodesy$Geodesy$isFinite = function (num) {
+	return function (_p2) {
+		return !_elm_lang$core$Basics$isNaN(_p2);
+	}(num) && function (_p3) {
+		return !_elm_lang$core$Basics$isInfinite(_p3);
+	}(num);
+};
+var _fbonetti$elm_geodesy$Geodesy$ln = _elm_lang$core$Basics$logBase(_elm_lang$core$Basics$e);
+var _fbonetti$elm_geodesy$Geodesy$floatMod = F2(
+	function (a, b) {
+		return a - (b * function (_p4) {
+			return _elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$floor(_p4));
+		}(a / b));
+	});
+var _fbonetti$elm_geodesy$Geodesy$toDegrees = function (num) {
+	return (num * 180) / _elm_lang$core$Basics$pi;
+};
+var _fbonetti$elm_geodesy$Geodesy$toRadians = function (num) {
+	return (num * _elm_lang$core$Basics$pi) / 180;
+};
+var _fbonetti$elm_geodesy$Geodesy$initialBearing = F2(
+	function (_p6, _p5) {
+		var _p7 = _p6;
+		var _p8 = _p5;
+		var deltaLon = _fbonetti$elm_geodesy$Geodesy$toRadians(_p8._1 - _p7._1);
+		var lat2_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p8._0);
+		var y = _elm_lang$core$Basics$sin(deltaLon) * _elm_lang$core$Basics$cos(lat2_);
+		var lat1_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p7._0);
+		var x = (_elm_lang$core$Basics$cos(lat1_) * _elm_lang$core$Basics$sin(lat2_)) - ((_elm_lang$core$Basics$sin(lat1_) * _elm_lang$core$Basics$cos(lat2_)) * _elm_lang$core$Basics$cos(deltaLon));
+		return _fbonetti$elm_geodesy$Geodesy$toDegrees(
+			A2(_elm_lang$core$Basics$atan2, y, x));
+	});
+var _fbonetti$elm_geodesy$Geodesy$finalBearing = F2(
+	function (start, destination) {
+		return A2(
+			_fbonetti$elm_geodesy$Geodesy$floatMod,
+			A2(_fbonetti$elm_geodesy$Geodesy$initialBearing, destination, start) + 180,
+			360);
+	});
+var _fbonetti$elm_geodesy$Geodesy$midpoint = F2(
+	function (_p10, _p9) {
+		var _p11 = _p10;
+		var _p13 = _p11._1;
+		var _p12 = _p9;
+		var deltaLon = _fbonetti$elm_geodesy$Geodesy$toRadians(_p12._1 - _p13);
+		var lat2_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p12._0);
+		var bx = _elm_lang$core$Basics$cos(lat2_) * _elm_lang$core$Basics$cos(deltaLon);
+		var by = _elm_lang$core$Basics$cos(lat2_) * _elm_lang$core$Basics$sin(deltaLon);
+		var lon1_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p13);
+		var lat1_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p11._0);
+		var x = _elm_lang$core$Basics$sqrt(
+			((_elm_lang$core$Basics$cos(lat1_) + bx) * (_elm_lang$core$Basics$cos(lat1_) + bx)) + (by * by));
+		var y = _elm_lang$core$Basics$sin(lat1_) + _elm_lang$core$Basics$sin(lat2_);
+		var lat3 = A2(_elm_lang$core$Basics$atan2, y, x);
+		var lon3 = lon1_ + A2(
+			_elm_lang$core$Basics$atan2,
+			by,
+			_elm_lang$core$Basics$cos(lat1_) + bx);
+		var lon3_ = A2(
+			_fbonetti$elm_geodesy$Geodesy$floatMod,
+			_fbonetti$elm_geodesy$Geodesy$toDegrees(lon3) + 540,
+			360) - 180;
+		return {
+			ctor: '_Tuple2',
+			_0: _fbonetti$elm_geodesy$Geodesy$toDegrees(lat3),
+			_1: lon3_
+		};
+	});
+var _fbonetti$elm_geodesy$Geodesy$rhumbBearing = F2(
+	function (_p15, _p14) {
+		var _p16 = _p15;
+		var _p17 = _p14;
+		var deltaLon = _fbonetti$elm_geodesy$Geodesy$toRadians(_p17._1 - _p16._1);
+		var deltaLon_ = (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Basics$abs(deltaLon),
+			_elm_lang$core$Basics$pi) > 0) ? ((_elm_lang$core$Native_Utils.cmp(deltaLon, 0) > 0) ? _elm_lang$core$Basics$negate((2 * _elm_lang$core$Basics$pi) - deltaLon) : ((2 * _elm_lang$core$Basics$pi) + deltaLon)) : deltaLon;
+		var lat2_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p17._0);
+		var lat1_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p16._0);
+		var deltaPsi = _fbonetti$elm_geodesy$Geodesy$ln(
+			_elm_lang$core$Basics$tan((lat2_ / 2) + (_elm_lang$core$Basics$pi / 4)) / _elm_lang$core$Basics$tan((lat1_ / 2) + (_elm_lang$core$Basics$pi / 4)));
+		var theta = A2(_elm_lang$core$Basics$atan2, deltaLon_, deltaPsi);
+		return A2(
+			_fbonetti$elm_geodesy$Geodesy$floatMod,
+			_fbonetti$elm_geodesy$Geodesy$toDegrees(theta) + 360,
+			360);
+	});
+var _fbonetti$elm_geodesy$Geodesy$rhumbMidpoint = F2(
+	function (_p19, _p18) {
+		var _p20 = _p19;
+		var _p21 = _p18;
+		var lon2_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p21._1);
+		var lon1_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p20._1);
+		var lon1__ = (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Basics$abs(lon2_ - lon1_),
+			_elm_lang$core$Basics$pi) > 0) ? (lon1_ + (2 * _elm_lang$core$Basics$pi)) : lon1_;
+		var lat2_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p21._0);
+		var f2 = _elm_lang$core$Basics$tan((_elm_lang$core$Basics$pi / 4) + (lat2_ / 2));
+		var lat1_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p20._0);
+		var lat3 = (lat1_ + lat2_) / 2;
+		var f3 = _elm_lang$core$Basics$tan((_elm_lang$core$Basics$pi / 4) + (lat3 / 2));
+		var lat3Degrees = _fbonetti$elm_geodesy$Geodesy$toDegrees(lat3);
+		var f1 = _elm_lang$core$Basics$tan((_elm_lang$core$Basics$pi / 4) + (lat1_ / 2));
+		var lon3 = ((((lon2_ - lon1__) * _fbonetti$elm_geodesy$Geodesy$ln(f3)) + (lon1__ * _fbonetti$elm_geodesy$Geodesy$ln(f2))) - (lon2_ * _fbonetti$elm_geodesy$Geodesy$ln(f1))) / _fbonetti$elm_geodesy$Geodesy$ln(f2 / f1);
+		var lon3_ = function (_p22) {
+			return !_fbonetti$elm_geodesy$Geodesy$isFinite(_p22);
+		}(lon3) ? ((lon1__ + lon2_) / 2) : lon3;
+		var lon3Degrees = A2(
+			_fbonetti$elm_geodesy$Geodesy$floatMod,
+			_fbonetti$elm_geodesy$Geodesy$toDegrees(lon3_) + 540,
+			360) - 180;
+		return {ctor: '_Tuple2', _0: lat3Degrees, _1: lon3Degrees};
+	});
+var _fbonetti$elm_geodesy$Geodesy$earthRadius = function (unit) {
+	var _p23 = unit;
+	switch (_p23.ctor) {
+		case 'Kilometers':
+			return 6371.0;
+		case 'Meters':
+			return 6371000;
+		case 'Miles':
+			return 3958.8;
+		default:
+			return 5280 * 3958.8;
+	}
+};
+var _fbonetti$elm_geodesy$Geodesy$distance = F3(
+	function (_p25, _p24, unit) {
+		var _p26 = _p25;
+		var _p27 = _p24;
+		var radius = _fbonetti$elm_geodesy$Geodesy$earthRadius(unit);
+		var lon2_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p27._1);
+		var lon1_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p26._1);
+		var deltaLon = lon2_ - lon1_;
+		var lat2_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p27._0);
+		var lat1_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p26._0);
+		var deltaLat = lat2_ - lat1_;
+		var a = (_elm_lang$core$Basics$sin(deltaLat / 2) * _elm_lang$core$Basics$sin(deltaLat / 2)) + (((_elm_lang$core$Basics$cos(lat1_) * _elm_lang$core$Basics$cos(lat2_)) * _elm_lang$core$Basics$sin(deltaLon / 2)) * _elm_lang$core$Basics$sin(deltaLon / 2));
+		var c = 2 * A2(
+			_elm_lang$core$Basics$atan2,
+			_elm_lang$core$Basics$sqrt(a),
+			_elm_lang$core$Basics$sqrt(1 - a));
+		return radius * c;
+	});
+var _fbonetti$elm_geodesy$Geodesy$rhumbDistance = F3(
+	function (_p29, _p28, unit) {
+		var _p30 = _p29;
+		var _p31 = _p28;
+		var deltaLon = function (_p32) {
+			return _fbonetti$elm_geodesy$Geodesy$toRadians(
+				_elm_lang$core$Basics$abs(_p32));
+		}(_p31._1 - _p30._1);
+		var deltaLon_ = (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Basics$abs(deltaLon),
+			_elm_lang$core$Basics$pi) > 0) ? ((_elm_lang$core$Native_Utils.cmp(deltaLon, 0) > 0) ? ((2 * _elm_lang$core$Basics$pi) - deltaLon) : ((2 * _elm_lang$core$Basics$pi) + deltaLon)) : deltaLon;
+		var lat2_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p31._0);
+		var lat1_ = _fbonetti$elm_geodesy$Geodesy$toRadians(_p30._0);
+		var deltaLat = lat2_ - lat1_;
+		var projectedLatDelta = _fbonetti$elm_geodesy$Geodesy$ln(
+			_elm_lang$core$Basics$tan((lat2_ / 2) + (_elm_lang$core$Basics$pi / 4)) / _elm_lang$core$Basics$tan((lat1_ / 2) + (_elm_lang$core$Basics$pi / 4)));
+		var q = (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Basics$abs(projectedLatDelta),
+			1.0e-11) > 0) ? (deltaLat / projectedLatDelta) : _elm_lang$core$Basics$cos(lat1_);
+		var a = _elm_lang$core$Basics$sqrt((deltaLat * deltaLat) + (((q * q) * deltaLon_) * deltaLon_));
+		var radius = _fbonetti$elm_geodesy$Geodesy$earthRadius(unit);
+		return a * radius;
+	});
+var _fbonetti$elm_geodesy$Geodesy$Feet = {ctor: 'Feet'};
+var _fbonetti$elm_geodesy$Geodesy$Miles = {ctor: 'Miles'};
+var _fbonetti$elm_geodesy$Geodesy$Meters = {ctor: 'Meters'};
+var _fbonetti$elm_geodesy$Geodesy$Kilometers = {ctor: 'Kilometers'};
